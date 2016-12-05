@@ -9,13 +9,40 @@ var passport = require('passport');
 var config = require('./config/config');
 
 // Load controllers
-var slotController = require('./controllers/slot');
+var shiftController = require('./controllers/shift');
 var userController = require('./controllers/user');
 var authController = require('./controllers/auth');
-var testController = require('./controllers/test');
 
-// Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/shiftstarter2');
+// Connect to MongoDB, configure in config.js
+mongoose.connect( config.database );
+
+// When successfully connected
+mongoose.connection.on('connected', function () {  
+  console.log( config.database );
+  console.log('DB connection: SUCCESS');
+}); 
+
+// If the connection throws an error
+mongoose.connection.on('error',function (err) {  
+  console.log( config.database );
+  console.log('DB connection: ERROR');
+  console.log(err);
+}); 
+
+// When the connection is disconnected
+mongoose.connection.on('disconnected', function () {  
+  console.log('DB connection: DISCONNECTED'); 
+});
+
+// If the Node process ends, close the Mongoose connection 
+process.on('SIGINT', function() {  
+  mongoose.connection.close(function () { 
+    console.log('DB connection: CLOSED'); 
+    process.exit(0); 
+  }); 
+}); 
+
+
 
 // Create our Express application
 var app = express();
@@ -53,18 +80,18 @@ var port = process.env.PORT || 3000;
 // Create our Express router
 var router = express.Router();
 
-// Create endpoint handlers for /slots
-router.route('/slots')
-  .post(authController.isJwtAuthenticated, slotController.postSlots)
-  .get(authController.isJwtAuthenticated, slotController.getSlots);
+// Create endpoint handlers for /shifts
+router.route('/shifts')
+  .post(authController.isJwtAuthenticated, shiftController.postShifts)
+  .get(authController.isJwtAuthenticated, shiftController.getShifts);
 
-// Create endpoint handlers for /slots/:id
-router.route('/slots/:slot_id')
-  .get(authController.isJwtAuthenticated, slotController.getSlot);
+// Create endpoint handlers for /shifts/:id
+router.route('/shifts/:shift_id')
+  .get(authController.isJwtAuthenticated, shiftController.getShift);
 
-// Create endpoint handler for /slots/:id/assign
-router.route('/slots/:slot_id/assign')
-  .put(authController.isJwtAuthenticated, slotController.assignSlot);
+// Create endpoint handler for /shifts/:id/assign
+router.route('/shifts/:shift_id/assign')
+  .put(authController.isJwtAuthenticated, shiftController.assignShift);
 
 // Create endpointhandlers for /users
 router.route('/users')
@@ -73,9 +100,6 @@ router.route('/users')
 
 router.route('/auth')
   .post(authController.postAuth);
-
-router.route('/test')
-  .get(authController.isJwtAuthenticated, testController.getHello);
 
 // Register all our routes with /api
 app.use('/api/v1', router);
