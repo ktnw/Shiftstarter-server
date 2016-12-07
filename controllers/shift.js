@@ -47,31 +47,30 @@ exports.getShift = function(req, res) {
 };
 
 // Create endpoint /api/shifts/:shift_id/assign for PUT
-exports.assignShift = function(req, res) {
+exports.assignSlot = function(req, res) {
   currentUser = req.user;
-  // Use the Shift model to find a specific shift
-  shift.findById(req.params.shift_id, function(err, shift) {
-    
-    if (err)
-      res.send(err);
 
-    // Toggle the existing shift assignment
+  Shift.findById(req.params.shift_id, function(err, shift) {
+    shift.assign(currentUser, function(err, shift) {
+      if (err)
+        res.status(403).send(err.message);
 
-    if ( shift.assigned !=="" && shift.assigned !== currentUser.username ) {
-      res.status(403).send( 'Cannot modify this assignment.' )
-    } else {
-      if ( shift.assigned == "" ) {
-        shift.assigned = currentUser.username
-      } else {
-        shift.assigned = ""
-      }
-      shift.save(function(err) {
-        if (err)
-          res.send(err);
-
-        res.json(shift);
-      });
-    }
-
+      res.json(shift);
+    });
   });
 };
+
+// Create endpoint /shifts/:shift_id/release for PUT
+exports.releaseSlot = function(req, res) {
+  currentUser = req.user;
+  // Find the specific shift
+  Shift.findById(req.params.shift_id, function(err, shift) {
+    shift.release(currentUser, function(err, shift) {
+      if (err)
+        res.status(403).send(err.message);
+
+      res.json(shift);
+    });
+  });
+};
+

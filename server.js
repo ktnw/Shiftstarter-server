@@ -91,7 +91,11 @@ router.route('/shifts/:shift_id')
 
 // Create endpoint handler for /shifts/:id/assign
 router.route('/shifts/:shift_id/assign')
-  .put(authController.isJwtAuthenticated, shiftController.assignShift);
+  .put(authController.isJwtAuthenticated, shiftController.assignSlot);
+
+// Create endpoint handler for /shifts/:id/release
+router.route('/shifts/:shift_id/release')
+  .put(authController.isJwtAuthenticated, shiftController.releaseSlot);
 
 // Create endpointhandlers for /users
 router.route('/users')
