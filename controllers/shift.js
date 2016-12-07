@@ -51,29 +51,42 @@ exports.getShift = function(req, res) {
 
 // Create endpoint /api/shifts/:shift_id/assign for PUT
 exports.assignSlot = function(req, res) {
-  currentUser = req.user;
+  var currentUser = req.user;
+  var filter = { "_id" : req.params.shift_id, "account" : currentUser.account, "class" : currentUser.class };
 
-  Shift.findById(req.params.shift_id, function(err, shift) {
-    shift.assign(currentUser, function(err, shift) {
-      if (err)
-        res.status(403).send(err.message);
+  Shift.findOne( filter, function(err, shift) {
+    if (shift) {
+      shift.assign(currentUser, function(err, shift) {
+        if (err)
+          res.status(403).send(err.message);
 
-      res.json(shift);
-    });
+        res.json(shift);
+      });
+    } else {
+      res.status(404).send("Shift not found.");
+    }
   });
 };
 
 // Create endpoint /shifts/:shift_id/release for PUT
+// it's not really required to protect the shift by filtering by account+class, but if account or class don't match
+// the API should return 404 "resource not found" rather than 403 "Cannot release the slot",
+// which is not a big issue, but it would point to the existence of a resource that the user doesn't have the privilege to operate on.
 exports.releaseSlot = function(req, res) {
-  currentUser = req.user;
-  // Find the specific shift
-  Shift.findById(req.params.shift_id, function(err, shift) {
-    shift.release(currentUser, function(err, shift) {
-      if (err)
-        res.status(403).send(err.message);
+  var currentUser = req.user;
+  var filter = { "_id" : req.params.shift_id, "account" : currentUser.account, "class" : currentUser.class };
 
-      res.json(shift);
-    });
+  Shift.findOne( filter, function(err, shift) {
+    if (shift) {
+      shift.release(currentUser, function(err, shift) {
+        if (err)
+          res.status(403).send(err.message);
+
+        res.json(shift);
+      });
+    } else {
+      res.status(404).send("Shift not found.");
+    }
   });
 };
 
