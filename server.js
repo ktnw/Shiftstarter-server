@@ -10,7 +10,7 @@ var config = require('./config/config');
 
 // Load controllers
 var shiftController = require('./controllers/shift');
-var userController = require('./controllers/user');
+//var userController = require('./controllers/user');
 var authController = require('./controllers/auth');
 
 // Connect to MongoDB, configure in config.js
@@ -82,12 +82,7 @@ var router = express.Router();
 
 // Create endpoint handlers for /shifts
 router.route('/shifts')
-  .post(authController.isJwtAuthenticated, shiftController.postShifts)
   .get(authController.isJwtAuthenticated, shiftController.getShifts);
-
-// Create endpoint handlers for /shifts/:id
-router.route('/shifts/:shift_id')
-  .get(authController.isJwtAuthenticated, shiftController.getShift);
 
 // Create endpoint handler for /shifts/:id/assign
 router.route('/shifts/:shift_id/assign')
@@ -96,11 +91,6 @@ router.route('/shifts/:shift_id/assign')
 // Create endpoint handler for /shifts/:id/release
 router.route('/shifts/:shift_id/release')
   .put(authController.isJwtAuthenticated, shiftController.releaseSlot);
-
-// Create endpointhandlers for /users
-router.route('/users')
-  .get(userController.getUsers)
-  .post(userController.postUsers);
 
 router.route('/auth')
   .post(authController.postAuth);

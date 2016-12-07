@@ -1,3 +1,6 @@
+/*
+THIS WHOLE CONTROLLER IS NOT REQUIRED FOR THE API
+
 // Load required packages
 
 // Load models
@@ -31,3 +34,5 @@ exports.postUsers = function(req, res) {
     });
   }
 }
+
+*/
