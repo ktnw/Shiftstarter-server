@@ -4,9 +4,12 @@
 var Shift = require('../models/shift');
 
 // Create endpoint /api/v1/shifts for GET
+// Use the Shift model to find all relevant shifts (matching the account and the class)
 exports.getShifts = function(req, res) {
-  // Use the Shift model to find all shifts
-  Shift.find(function(err, shifts) {
+  var currentUser = req.user;
+  var filter = { "account" : currentUser.account, "class" : currentUser.class };
+
+  Shift.find( filter, function(err, shifts) {
     if (err)
       res.send(err);
 

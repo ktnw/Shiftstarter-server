@@ -3,11 +3,12 @@ var mongoose = require('mongoose');
 
 // Define slot schema
 var ShiftSchema   = new mongoose.Schema({
-  class: String,
-  start: Date,
   end: Date,
+  start: Date,
+  class: String,
   total_slots: Number,
-  slots: Array
+  slots: Array,
+  account: String
 });
 
 ShiftSchema.methods.assign = function(user, callback) {
