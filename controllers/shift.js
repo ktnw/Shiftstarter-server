@@ -7,14 +7,17 @@ var Shift = require('../models/shift');
 // Use the Shift model to find all relevant shifts (matching the account and the class)
 exports.getShifts = function(req, res) {
   var currentUser = req.user;
-  var filter = { "account" : currentUser.account, "class" : currentUser.class };
+  var now = new Date();
+  
+  // we use "end" so that also the current running shift is shown until it ends, then it's not shown anymore
+  var filter = { "account" : currentUser.account, "class" : currentUser.class, "end" : { $gt: now } };
 
   Shift.find( filter, function(err, shifts) {
     if (err)
       res.send(err);
 
     res.json(shifts);
-  });
+  }).sort( { start: 1 } );
 };
 
 // Create endpoint /api/shifts/:shift_id/assign for PUT
