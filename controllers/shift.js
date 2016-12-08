@@ -8,9 +8,13 @@ var Shift = require('../models/shift');
 exports.getShifts = function(req, res) {
   var currentUser = req.user;
   var now = new Date();
-  
+  var addedFilter = req.query.f;
+
   // we use "end" so that also the current running shift is shown until it ends, then it's not shown anymore
   var filter = { "account" : currentUser.account, "class" : currentUser.class, "end" : { $gt: now } };
+
+  if (addedFilter == "my")
+    filter.slots = currentUser._id;
 
   Shift.find( filter, function(err, shifts) {
     if (err)
